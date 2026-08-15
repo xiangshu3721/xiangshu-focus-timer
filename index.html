@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#e9f1ea" />
+  <title>专注计时器</title>
+  <style>
+    :root { --ink:#24342a; --muted:#627268; --accent:#547d63; --accent-dark:#3c6149; --paper:#fbfcf8; --line:#dce6db; --soft:#edf4ea; }
+    * { box-sizing:border-box; }
+    body { margin:0; min-height:100vh; display:grid; place-items:center; padding:24px; color:var(--ink); background:radial-gradient(circle at 15% 10%, #f6ead6 0 10%, transparent 34%), radial-gradient(circle at 86% 91%, #dcecdf 0 6%, transparent 33%), #edf3eb; font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif; }
+    main { width:min(100%, 470px); padding:40px 30px 28px; text-align:center; border:1px solid rgba(255,255,255,.8); border-radius:32px; background:rgba(251,252,248,.88); box-shadow:0 22px 60px rgba(46,76,55,.14); backdrop-filter:blur(12px); }
+    .eyebrow { margin:0 0 8px; font-size:13px; letter-spacing:.16em; color:var(--accent); }
+    h1 { margin:0; font-family:"Songti SC","STSong",serif; font-size:30px; font-weight:600; letter-spacing:.08em; }
+    .motto { margin:10px 0 27px; color:var(--muted); font-size:14px; }
+    .timer { width:min(76vw, 318px); aspect-ratio:1; display:grid; place-items:center; margin:0 auto 27px; position:relative; border-radius:50%; background:conic-gradient(var(--accent) calc(var(--progress) * 1turn), var(--soft) 0); }
+    .timer::before { content:""; position:absolute; inset:10px; border-radius:50%; background:var(--paper); }
+    .time-wrap { position:relative; z-index:1; }
+    #time { font-size:62px; font-weight:350; letter-spacing:.02em; font-variant-numeric:tabular-nums; line-height:1; }
+    #state { display:block; margin-top:10px; color:var(--muted); font-size:14px; }
+    .presets { display:flex; justify-content:center; gap:8px; flex-wrap:wrap; margin:0 0 20px; }
+    .preset { appearance:none; border:1px solid var(--line); background:transparent; color:var(--muted); border-radius:99px; padding:8px 13px; font:inherit; font-size:13px; cursor:pointer; transition:.2s; }
+    .preset:hover, .preset[aria-pressed="true"] { color:var(--accent-dark); border-color:#a9c7ad; background:var(--soft); }
+    .controls { display:grid; grid-template-columns:1fr 1.25fr 1fr; gap:10px; }
+    button { min-height:48px; border-radius:15px; border:1px solid var(--line); background:#fff; color:var(--ink); font:inherit; font-size:15px; cursor:pointer; transition:transform .15s, background .15s, box-shadow .15s; }
+    button:hover { transform:translateY(-1px); box-shadow:0 5px 12px rgba(45,78,55,.10); }
+    button:focus-visible { outline:3px solid rgba(84,125,99,.35); outline-offset:2px; }
+    #start { border-color:var(--accent); color:white; background:var(--accent); font-weight:600; }
+    #start:hover { background:var(--accent-dark); }
+    .hint { margin:23px 0 0; color:#839087; font-size:12px; }
+    @media (prefers-reduced-motion:reduce) { *,*::before { transition:none !important; } }
+  </style>
+</head>
+<body>
+  <main>
+    <p class="eyebrow">TAKE A BREATH</p>
+    <h1>专注计时器</h1>
+    <p class="motto">给此刻一点安静、完整的时间</p>
+    <div class="timer" id="timer" style="--progress:0">
+      <div class="time-wrap"><div id="time" aria-live="polite">25:00</div><span id="state">准备开始</span></div>
+    </div>
+    <div class="presets" aria-label="快捷时长">
+      <button class="preset" data-minutes="5">5 分钟</button>
+      <button class="preset" data-minutes="25" aria-pressed="true">25 分钟</button>
+      <button class="preset" data-minutes="45">45 分钟</button>
+      <button class="preset" data-minutes="60">60 分钟</button>
+    </div>
+    <div class="controls">
+      <button id="reset" type="button">重置</button>
+      <button id="start" type="button">开始</button>
+      <button id="add" type="button">+5 分钟</button>
+    </div>
+    <p class="hint">提示：按空格键可开始或暂停</p>
+  </main>
+  <script>
+    (() => {
+      const timeEl = document.querySelector('#time');
+      const stateEl = document.querySelector('#state');
+      const timerEl = document.querySelector('#timer');
+      const startBtn = document.querySelector('#start');
+      const resetBtn = document.querySelector('#reset');
+      const addBtn = document.querySelector('#add');
+      const presets = [...document.querySelectorAll('.preset')];
+      let total = 25 * 60, remaining = total, running = false, endAt = 0, interval = null;
+
+      const format = seconds => `${String(Math.floor(seconds / 60)).padStart(2,'0')}:${String(seconds % 60).padStart(2,'0')}`;
+      function render() {
+        remaining = Math.max(0, Math.ceil(remaining));
+        timeEl.textContent = format(remaining);
+        document.title = `${format(remaining)} · 专注计时器`;
+        timerEl.style.setProperty('--progress', total ? 1 - remaining / total : 0);
+      }
+      function stop(done=false) {
+        clearInterval(interval); interval = null; running = false;
+        startBtn.textContent = '开始';
+        stateEl.textContent = done ? '时间到，休息一下吧' : '已暂停';
+        if (done && navigator.vibrate) navigator.vibrate([180, 100, 180]);
+      }
+      function tick() {
+        remaining = (endAt - Date.now()) / 1000;
+        if (remaining <= 0) { remaining = 0; render(); stop(true); return; }
+        render();
+      }
+      function toggle() {
+        if (running) { tick(); stop(); return; }
+        if (remaining <= 0) remaining = total;
+        endAt = Date.now() + remaining * 1000;
+        running = true; startBtn.textContent = '暂停'; stateEl.textContent = '正在专注';
+        interval = setInterval(tick, 250); tick();
+      }
+      function setMinutes(minutes) {
+        clearInterval(interval); interval = null; running = false;
+        total = remaining = minutes * 60;
+        startBtn.textContent = '开始'; stateEl.textContent = '准备开始';
+        presets.forEach(b => b.setAttribute('aria-pressed', String(+b.dataset.minutes === minutes)));
+        render();
+      }
+      startBtn.addEventListener('click', toggle);
+      resetBtn.addEventListener('click', () => setMinutes(Math.round(total / 60)));
+      addBtn.addEventListener('click', () => { total += 300; remaining += 300; render(); });
+      presets.forEach(b => b.addEventListener('click', () => setMinutes(+b.dataset.minutes)));
+      document.addEventListener('keydown', e => { if (e.code === 'Space' && !['INPUT','TEXTAREA','BUTTON'].includes(document.activeElement.tagName)) { e.preventDefault(); toggle(); } });
+      render();
+    })();
+  </script>
+</body>
+</html>
