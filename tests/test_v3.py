@@ -112,7 +112,7 @@ class V31StaticChecks(unittest.TestCase):
         self.assertIn("CFG.localPhotos={avatar:'assets/naisi.jpg',portrait:'assets/naisi.jpg',drawing:'assets/naisi.jpg'};", self.source)
 
     def test_hero_photo_shows_more_shoulders(self):
-        self.assertIn(".hero-photo img{object-position:center 68%}", self.source)
+        self.assertIn(".hero-photo img{object-position:center 100%}", self.source)
 
 
 if __name__ == "__main__":
