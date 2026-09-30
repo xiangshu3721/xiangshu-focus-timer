@@ -52,6 +52,16 @@
   html,body{overflow-x:hidden}
   .control-panel>.cab-view{height:clamp(150px,22dvh,220px);min-height:0;flex:none;margin:0 0 2px}
 }
+/* Keep the whole page scrollable when the right panel is taller than the viewport. */
+html,body{height:auto;min-height:100%;overflow-x:hidden;overflow-y:auto}
+.app{height:auto;min-height:100dvh;overflow:visible}
+.game-shell{height:auto;max-height:none;flex:0 0 auto;overflow:visible}
+@media(max-width:900px){
+  .game-shell{min-height:0}
+  .world{overflow:visible}
+  .control-panel{height:auto;min-height:220px;flex:0 0 auto;overflow:visible}
+}
+@media(min-width:901px){.game-shell{min-height:calc(100dvh - 95px)}}
 </style>
 </head>
 <body>
