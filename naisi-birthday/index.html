@@ -33,13 +33,8 @@
 .album-stage{height:clamp(260px,calc(38vw + 20px),350px)}.album-arrow{top:clamp(155px,23vw,200px)}
 .route-plan{padding:10px 12px;border:2px solid #dcecf4;border-radius:16px;background:#f7fbff;color:#5f7890;font-size:12px;font-weight:900;line-height:1.6;text-align:center}.route-plan strong{display:block;color:#315777;font-size:13px}
 @media(min-width:901px){
-  html,body{height:auto;min-height:100%;overflow-x:hidden;overflow-y:auto}
-  .app{height:auto;min-height:100dvh;overflow:visible}
-  .game-shell{height:auto;max-height:none;min-height:calc(100dvh - 95px);flex:0 0 auto;overflow:visible}
-  .world{min-height:0;align-self:start;overflow:hidden}
   .map-viewport{height:clamp(360px,calc(100dvh - 240px),730px);min-height:360px;max-height:none;flex:none}
-  .control-panel{height:max-content;min-height:calc(100dvh - 95px);align-self:start;justify-content:flex-start;gap:10px;padding:14px 16px;overflow:visible;scrollbar-width:none}
-  .control-panel::-webkit-scrollbar{display:none}
+  .control-panel{align-self:start;justify-content:flex-start;gap:10px;padding:14px 16px}
   .control-panel>.cab-view{order:-1;flex:0 0 clamp(130px,18dvh,190px);width:100%;height:clamp(130px,18dvh,190px);min-height:0;max-height:none;margin:0 0 2px;border-radius:18px}
   .control-panel>.cab-view .cab-destination{top:8px;padding:5px 12px;font-size:14px}
   .control-panel>.cab-view .cab-console{height:28%;min-height:55px;border-top-width:7px}
@@ -49,19 +44,22 @@
   .control-panel>.cab-view .cab-caption{bottom:28%;font-size:14px;padding:5px 8px}
 }
 @media(max-width:900px){
-  html,body{overflow-x:hidden}
   .control-panel>.cab-view{height:clamp(150px,22dvh,220px);min-height:0;flex:none;margin:0 0 2px}
 }
-/* Keep the whole page scrollable when the right panel is taller than the viewport. */
-html,body{height:auto;min-height:100%;overflow-x:hidden;overflow-y:auto}
-.app{height:auto;min-height:100dvh;overflow:visible}
-.game-shell{height:auto;max-height:none;flex:0 0 auto;overflow:visible}
+/* The page is the scroll owner. Do not let the split game shell trap the document in a viewport-sized flex box. */
+html{height:auto;min-height:100%;overflow-x:hidden;overflow-y:scroll}
+body{height:auto;min-height:100%;overflow:visible;overscroll-behavior-y:auto}
+.app{display:block;height:auto;min-height:0;overflow:visible}
+.game-shell{height:auto;min-height:0;max-height:none;flex:none;overflow:visible}
+.world{min-height:0;overflow:visible}
+.map-viewport{flex:none}
+.control-panel{height:auto;min-height:0;max-height:none;overflow:visible}
 @media(max-width:900px){
-  .game-shell{min-height:0}
-  .world{overflow:visible}
-  .control-panel{height:auto;min-height:220px;flex:0 0 auto;overflow:visible}
+  .game-shell{display:block}
+  .world{display:block}
+  .map-viewport{display:block}
+  .control-panel{display:flex;flex-direction:column}
 }
-@media(min-width:901px){.game-shell{min-height:calc(100dvh - 95px)}}
 </style>
 </head>
 <body>
