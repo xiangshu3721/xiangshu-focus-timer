@@ -35,10 +35,10 @@
 @media(min-width:901px){
   html,body{height:auto;min-height:100%;overflow-x:hidden;overflow-y:auto}
   .app{height:auto;min-height:100dvh;overflow:visible}
-  .game-shell{height:auto;max-height:none;min-height:calc(100dvh - 95px);flex:0 0 auto;overflow:hidden}
+  .game-shell{height:auto;max-height:none;min-height:calc(100dvh - 95px);flex:0 0 auto;overflow:visible}
   .world{min-height:0;align-self:start;overflow:hidden}
   .map-viewport{height:clamp(360px,calc(100dvh - 240px),730px);min-height:360px;max-height:none;flex:none}
-  .control-panel{min-height:0;justify-content:flex-start;gap:10px;padding:14px 16px;overflow:visible;scrollbar-width:none}
+  .control-panel{height:max-content;min-height:calc(100dvh - 95px);align-self:start;justify-content:flex-start;gap:10px;padding:14px 16px;overflow:visible;scrollbar-width:none}
   .control-panel::-webkit-scrollbar{display:none}
   .control-panel>.cab-view{order:-1;flex:0 0 clamp(130px,18dvh,190px);width:100%;height:clamp(130px,18dvh,190px);min-height:0;max-height:none;margin:0 0 2px;border-radius:18px}
   .control-panel>.cab-view .cab-destination{top:8px;padding:5px 12px;font-size:14px}
